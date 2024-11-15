@@ -2,7 +2,21 @@ import numpy as np
 
 # Model layer of neurons (with numpy)
 
-X =[ [1.8,7.5,4.2,5] , [5.8,3.5,4.25,5.6] , [3.8,7.5,4,5] , [1.89,7.35,7.2,9.5] ]
+# Set the seed
+np.random.seed(0)
+
+# sample input data
+def create_data(samples, classes):
+    X = np.zeros((samples*classes, 2))
+    y = np.zeros(samples*classes, dtype='uint8')
+    for class_number in range(classes):
+        ix = range(samples*class_number, samples*(class_number+1))
+        r = np.linspace(0.0, 1, samples)
+        t = np.linspace(class_number*4, (class_number+1)*4, samples) + np.random.randn(samples)*0.2
+        X[ix] = np.c_[r*np.sin(t*2.5), r*np.cos(t*2.5)]
+        y[ix] = class_number
+    return X, y
+
 
 class Layer_Dense:
     def __init__(self,n_inputs,n_neurons): 
@@ -11,14 +25,24 @@ class Layer_Dense:
     def forward(self,inputs):
         self.output = np.dot(inputs,self.weights) + self.biases
 
-layer1 = Layer_Dense(4,5)
-layer2 = Layer_Dense(5,2)
+
+class Activation_ReLU:
+    def forward(self,inputs):
+        self.output=np.maximum(0,inputs)
+
+
+X,y =create_data(100,3)
+
+layer1 = Layer_Dense(2,5)
 
 layer1.forward(X)
-print("Output of  the  layer 1 : " ,layer1.output)
+print("Output (u) of  the  layer 1 before  activation func : " ,layer1.output)
 
-layer2.forward(layer1.output)
-print("Output of  the  layer 2 : " ,layer2.output)
+print("------------------------------------------------------------------")
+
+activation1 = Activation_ReLU()
+activation1.forward(layer1.output)
+print("Output (y) of  the  layer 1 after  activation func : " ,activation1.output)
 
 
 
